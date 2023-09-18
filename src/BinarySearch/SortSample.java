@@ -102,40 +102,47 @@ public class SortSample {
 	}
 	
 	static void quickSort(int s, int e) {
+		//s,e포인터가 서로를 넘어가는 경우를 어떻게 해결해야 할지 도저히 생각이 안났음
+		//그래서 이경우 저경우 맴도는 생각을 하다가 4시간 이상을 고민했음
+		//결과적으로 s,e포인터가 서로를 넘지않도록 상황을 제한하여 문제를 해결하였음
+		//앞으로 이런 복잡한 상황이 발생하면 무조건 구현하는 것보다, 
+		//이런 머리 아픈 상황이 나오지 않도록 제한된 상황을 만들 수 없을까? 먼저 고민해보기!!!!!
+		
 		if(s>=e) return;
 		
-		if(s+1 == e) {
-			if(quickArr[s] > quickArr[e]) {
-				int temp = quickArr[s];
-				quickArr[s] = quickArr[e];
-				quickArr[e] = temp;
-			}
-			return;
-		}
-		
 		int pivot = s;
-		s = s+1;
-		
-		while(s<e) {
-			while(s<quickArr.length && quickArr[s] < quickArr[pivot]) s++;
-			while(e>=0 && quickArr[e] > quickArr[pivot]) e--;
+		int end = e;
+		s++;
+		while(true) {
+			//s 포인터와 e포인터가 서로를 넘어가지 않도록
+			while(s+1 <= e && quickArr[s] < quickArr[pivot]) s++;
+			while(e-1 >= s && quickArr[e] > quickArr[pivot]) e--;
 			
 			if(s<e) {
 				int temp = quickArr[s];
 				quickArr[s] = quickArr[e];
 				quickArr[e] = temp;
-				
-				s++;
-				e--;
+			}
+			
+			if(s == e) {
+				if(quickArr[s] > quickArr[pivot]) {
+					int temp = quickArr[s-1];
+					quickArr[s-1] = quickArr[pivot];
+					quickArr[pivot] = temp;
+					s--;
+				}
+				else if(quickArr[s] < quickArr[pivot]) {
+					int temp = quickArr[s];
+					quickArr[s] = quickArr[pivot];
+					quickArr[pivot] = temp;
+				}
+				break;
 			}
 		}
 		
-		int temp = quickArr[s-1];
-		quickArr[s-1] = quickArr[pivot];
-		quickArr[pivot] = temp;
+		quickSort(pivot, s-1);
+		quickSort(s+1, end);
 		
-		quickSort(pivot, s-2);
-		quickSort(s, e);	
 	}
 	
 	static int[] mergeSort(int[] arr) {
