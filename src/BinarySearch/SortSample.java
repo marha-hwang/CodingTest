@@ -1,12 +1,11 @@
 package BinarySearch;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
 public class SortSample {
 	static int[] quickArr;
+	static int[] mergeArr;
 	
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		//n개의 수가 주어졌을때 오름차순으로 정렬하는 문제
@@ -37,15 +36,16 @@ public class SortSample {
 		});
 		
 		quickArr = arr.clone();
-		quickSort(0, quickArr.length-1);
+		quickSort(0, n-1);
 		System.out.println();
 		Arrays.stream(quickArr).forEach((i) ->{
 			System.out.print(i);
 		});
 		
-		result = mergeSort(arr.clone());
+		mergeArr = arr.clone();
+		mergeSort(0, n-1);
 		System.out.println();
-		Arrays.stream(result).forEach((i) ->{
+		Arrays.stream(mergeArr).forEach((i) ->{
 			System.out.print(i);
 		});
 		
@@ -145,11 +145,79 @@ public class SortSample {
 		
 	}
 	
-	static int[] mergeSort(int[] arr) {
-		return arr;
+	static void mergeSort(int s, int e) {
+		//s==e인 경우 종료
+		if(s == e) return;
+		
+		//s~e인덱스를 절반으로 나누어 재귀 호출
+		int mid = (s+e)/2;
+		mergeSort(s, mid);
+		mergeSort(mid+1, e);
+		
+		//임시 배열을 만들어 수를 정렬하고 원본배열에 복사
+		int[] temp = new int[e-s+1];
+		int p1 = s;
+		int p2 = mid+1;
+		int i = 0;
+		
+		while(p1 <= mid && p2<=e) {
+			if(mergeArr[p1] < mergeArr[p2]) {
+				temp[i] = mergeArr[p1];
+				p1 ++;
+			}
+			else {
+				temp[i] = mergeArr[p2];
+				p2 ++;
+			}
+			i++;
+		}
+		
+		//남은 요소 다 털어버리기
+		while(p1 <= mid) {
+			temp[i] = mergeArr[p1];
+			p1++;
+			i++;
+		}
+		
+		while(p2 <= e) {
+			temp[i] = mergeArr[p2];
+			p2++;
+			i++;
+		}
+		
+		//원본 배열에 복사하기
+		for(int k = 0; k<temp.length; k++) {
+			mergeArr[s+k] = temp[k];
+		}
+		
 	}
 
-	static int[] radixSort(int[] arr) {
+	static int[] radixSort(int[] arr) {		
+		//0~9까지 담을 큐 생성
+		Queue<Integer>[] queArr = new Queue[19];
+		for(int i = 0; i<19; i++) {
+			queArr[i] = new LinkedList<Integer>();
+		}
+		
+		//가장 큰 숫자의 자릿수 만큼 반복 - 10000000
+		for(int i = 1; i<=8; i++) {
+			//배열 전체를 순회하면서 알맞은 큐에 삽입
+			//음수에 대한 처리를 하지 않아서 계속 인덱스 초과 오류가 떴음
+			for(int j = 0; j<arr.length; j++) {
+				int k = (int) ((arr[j] / Math.pow(10, i-1)) % 10);
+				queArr[9+k].add(arr[j]);
+			}
+			
+			//0을 담은 queue부터 배열에 담기
+			int p = 0;
+			for(int j = 0; j<19; j++) {
+				while(!queArr[j].isEmpty()) {
+					arr[p] = queArr[j].poll(); 
+					p++;
+				}
+			}
+					
+		}
 		return arr;
 	}
 }
